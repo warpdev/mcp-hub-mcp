@@ -1,0 +1,27 @@
+{
+	"name": "mcp-hub-mcp",
+	"version": "1.0.0",
+	"description": "MCP Hub server that connects to and manages other MCP servers",
+	"main": "dist/index.js",
+	"type": "module",
+	"scripts": {
+		"build": "tsc",
+		"start": "node dist/index.js",
+		"dev": "tsc && node dist/index.js",
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"keywords": [
+		"mcp",
+		"model-context-protocol"
+	],
+	"author": "",
+	"license": "MIT",
+	"dependencies": {
+		"@modelcontextprotocol/sdk": "^1.9.0",
+		"zod": "^3.22.4"
+	},
+	"devDependencies": {
+		"@types/node": "^18.19.3",
+		"typescript": "^5.3.3"
+	}
+}
