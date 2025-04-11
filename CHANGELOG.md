@@ -1,3 +1,10 @@
+## [1.0.3](https://github.com/warpdev/mcp-hub-mcp/compare/v1.0.2...v1.0.3) (2025-04-11)
+
+
+### Bug Fixes
+
+* fix run with npx cli ([c44218c](https://github.com/warpdev/mcp-hub-mcp/commit/c44218c5e56f25c399a267075238404b806ee451))
+
 ## [1.0.2](https://github.com/warpdev/mcp-hub-mcp/compare/v1.0.1...v1.0.2) (2025-04-11)
 
 
