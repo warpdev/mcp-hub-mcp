@@ -1,3 +1,10 @@
+## [1.0.1](https://github.com/warpdev/mcp-hub-mcp/compare/v1.0.0...v1.0.1) (2025-04-11)
+
+
+### Bug Fixes
+
+* fix package publish files ([627a30b](https://github.com/warpdev/mcp-hub-mcp/commit/627a30b74183e1dadc45aa5cec02ec3de374f165))
+
 # 1.0.0 (2025-04-11)
 
 
