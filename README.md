@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="https://imgur.com/DgWxkmv.png" width="200" height="200">
+</p>
+
 # MCP-Hub-MCP Server
 
 A hub server that connects to and manages other MCP (Model Context Protocol) servers.
