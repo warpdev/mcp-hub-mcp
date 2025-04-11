@@ -14,6 +14,28 @@ This project builds an MCP hub server that can connect to other MCP servers, lis
 - Call tools on connected servers and return results
 - Disconnect from servers
 
+## Configuration
+
+Add this to your `mcp.json`:
+
+#### Using npx
+
+```json
+{
+  "mcpServers": {
+    "mcp-hub-mcp": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "mcp-hub-mcp",
+        "--config-path",
+        "/Users/username/mcp.json"
+      ]
+    }
+  }
+}
+```
+
 ## Installation and Running
 
 ### Requirements
