@@ -1,3 +1,10 @@
+## [1.0.2](https://github.com/warpdev/mcp-hub-mcp/compare/v1.0.1...v1.0.2) (2025-04-11)
+
+
+### Bug Fixes
+
+* fix missing bin ([7dd5a1f](https://github.com/warpdev/mcp-hub-mcp/commit/7dd5a1fc5e8e701c0135f4f31dddeec168a663bb))
+
 ## [1.0.1](https://github.com/warpdev/mcp-hub-mcp/compare/v1.0.0...v1.0.1) (2025-04-11)
 
 
