@@ -5,14 +5,14 @@ A hub server that connects to and manages other MCP (Model Context Protocol) ser
 ## Overview
 
 This project builds an MCP hub server that can connect to other MCP servers, list their tools, and execute them.
+It is especially useful for bypassing Cursor’s 40-tool MCP limit.
+Even outside of Cursor, it helps reduce AI mistakes by hiding infrequently used tools.
 
 ## Key Features
 
 - Automatic connection to other MCP servers via configuration file
-- List connected servers
 - List available tools on connected servers
 - Call tools on connected servers and return results
-- Disconnect from servers
 
 ## Configuration
 
