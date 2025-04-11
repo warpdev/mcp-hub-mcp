@@ -4,6 +4,11 @@
 	"description": "MCP Hub server that connects to and manages other MCP servers",
 	"main": "dist/index.js",
 	"type": "module",
+	"files": [
+		"dist",
+		"README.md",
+		"LICENSE"
+	],
 	"scripts": {
 		"build": "tsc",
 		"start": "node dist/index.js",
