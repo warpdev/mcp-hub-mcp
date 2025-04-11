@@ -1,0 +1,59 @@
+name: PR Feedback
+on:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - labeled
+      - unlabeled
+jobs:
+  preview:
+    name: Preview Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "lts/*"
+          cache: "npm"
+      - name: Install dependencies
+        run: npm ci
+      - name: Preview Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npx semantic-release --dry-run
+      - name: Find Comment
+        uses: peter-evans/find-comment@v2
+        id: fc
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          comment-author: "github-actions[bot]"
+          body-includes: "### Semantic Release Preview"
+      - name: Generate Release Notes
+        id: release_notes
+        run: |
+          echo "RELEASE_NOTES<<EOF" >> $GITHUB_ENV
+          npx semantic-release --dry-run | grep -A 100 "Release note for" | sed 's/`//g' >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+      - name: Create or Update Comment
+        uses: peter-evans/create-or-update-comment@v2
+        with:
+          comment-id: ${{ steps.fc.outputs.comment-id }}
+          issue-number: ${{ github.event.pull_request.number }}
+          body: |
+            ### Semantic Release Preview
+
+            When this PR is merged to main, the following release will be created:
+
+            ${{ env.RELEASE_NOTES }}
+
+            The version is determined by [Conventional Commits](https://www.conventionalcommits.org/):
+            - `fix:` = PATCH release (1.0.0 → 1.0.1)
+            - `feat:` = MINOR release (1.0.0 → 1.1.0)
+            - `BREAKING CHANGE:` = MAJOR release (1.0.0 → 2.0.0)
+          edit-mode: replace

@@ -151,6 +151,33 @@ Calls a tool on a specific server.
 }
 ```
 
+## Commit Message Convention
+
+This project follows [Conventional Commits](https://www.conventionalcommits.org/) for automatic versioning and CHANGELOG generation.
+
+Format: `<type>(<scope>): <description>`
+
+Examples:
+
+- `feat: add new hub connection feature`
+- `fix: resolve issue with server timeout`
+- `docs: update API documentation`
+- `chore: update dependencies`
+
+Types:
+
+- `feat`: New feature (MINOR version bump)
+- `fix`: Bug fix (PATCH version bump)
+- `docs`: Documentation only changes
+- `style`: Changes that do not affect the meaning of the code
+- `refactor`: Code change that neither fixes a bug nor adds a feature
+- `perf`: Code change that improves performance
+- `test`: Adding missing tests or correcting existing tests
+- `chore`: Changes to the build process or auxiliary tools
+
+Breaking Changes:
+Add `BREAKING CHANGE:` in the commit footer to trigger a MAJOR version bump.
+
 ## Tech Stack
 
 - Node.js
