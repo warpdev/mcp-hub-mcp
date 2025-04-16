@@ -1,3 +1,10 @@
+# [1.1.0](https://github.com/warpdev/mcp-hub-mcp/compare/v1.0.3...v1.1.0) (2025-04-16)
+
+
+### Features
+
+* add description for better ai recognition ([0fd23a2](https://github.com/warpdev/mcp-hub-mcp/commit/0fd23a2d53337cf8fa36604c26bbccf7bcadcce1))
+
 ## [1.0.3](https://github.com/warpdev/mcp-hub-mcp/compare/v1.0.2...v1.0.3) (2025-04-11)
 
 
