@@ -40,6 +40,14 @@ Add this to your `mcp.json`:
 }
 ```
 
+### System Prompt (or Cursor Rules)
+
+```
+Before processing a user's request, you must use the "list_all_tools" command to identify which tools are available.
+```
+
+This ensures that the AI assistant will always check available tools before attempting to use them.
+
 ## Installation and Running
 
 ### Requirements
