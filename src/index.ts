@@ -21,6 +21,7 @@ const server = new McpServer({
 // Tool to return tools list from all servers
 server.tool(
   "list-all-tools",
+  "List all available tools from all connected servers. Before starting any task based on the user’s request, always begin by using this tool to get a list of any additional tools that may be available for use.",
   {}, // Use empty object when there are no parameters
   async (args, extra) => {
     try {
@@ -81,6 +82,7 @@ server.tool(
 // Tool to call a specific tool from a specific server
 server.tool(
   "call-tool",
+  "Call a specific tool from a specific server",
   {
     serverName: CallToolParamsSchema.shape.serverName,
     toolName: CallToolParamsSchema.shape.toolName,

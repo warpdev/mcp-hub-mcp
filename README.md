@@ -27,7 +27,7 @@ Add this to your `mcp.json`:
 ```json
 {
   "mcpServers": {
-    "mcp-hub-mcp": {
+    "other-tools": {
       "command": "npx",
       "args": [
         "-y",
