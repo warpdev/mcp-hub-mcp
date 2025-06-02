@@ -22,7 +22,16 @@ const server = new McpServer({
 server.tool(
   "list-all-tools",
   "List all available tools from all connected servers. Before starting any task based on the user’s request, always begin by using this tool to get a list of any additional tools that may be available for use.",
-  {}, // Use empty object when there are no parameters
+  {
+    type: "object",
+    properties: {
+      _dummy: {
+        type: "boolean",
+        description: "Dummy property to make the tool valid. Pass true.",
+      },
+    },
+    required: [],
+  },
   async (args, extra) => {
     try {
       const servers = serverManager.getConnectedServers();
