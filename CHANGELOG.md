@@ -1,3 +1,10 @@
+## [1.1.1](https://github.com/warpdev/mcp-hub-mcp/compare/v1.1.0...v1.1.1) (2025-06-02)
+
+
+### Bug Fixes
+
+* allow Claude Desktop to use this MCP ([6406cda](https://github.com/warpdev/mcp-hub-mcp/commit/6406cdaaeaf554cc1fb5c2194a8024280d603a9c))
+
 # [1.1.0](https://github.com/warpdev/mcp-hub-mcp/compare/v1.0.3...v1.1.0) (2025-04-16)
 
 
