@@ -127,7 +127,6 @@ async function startServer() {
     // Communication through standard input/output
     const transport = new StdioServerTransport();
     await server.connect(transport);
-    console.log("MCP-Hub-MCP server is running...");
 
     // Disconnect all connections on process termination
     process.on("SIGINT", async () => {
