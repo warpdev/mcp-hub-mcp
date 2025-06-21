@@ -3,7 +3,7 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { McpServerManager } from "./server-manager.js";
-import { CallToolParamsSchema } from "./types.js";
+import { CallToolParamsSchema, FindToolsParamsSchema } from "./types.js";
 
 // Create MCP server manager instance (auto load enabled)
 const serverManager = new McpServerManager({
@@ -113,6 +113,45 @@ server.tool(
             text: `Tool call failed: ${
               (error as Error).message
             }`,
+          },
+        ],
+        isError: true,
+      };
+    }
+  }
+);
+
+// Tool to find tools matching a pattern across all servers
+server.tool(
+  "find-tools",
+  "Find tools matching a regex pattern across all connected servers (grep-like functionality)",
+  {
+    pattern: FindToolsParamsSchema.shape.pattern,
+    searchIn: FindToolsParamsSchema.shape.searchIn,
+    caseSensitive: FindToolsParamsSchema.shape.caseSensitive,
+  },
+  async (args, extra) => {
+    try {
+      const { pattern, searchIn, caseSensitive } = args;
+      const results = await serverManager.findTools(pattern, {
+        searchIn,
+        caseSensitive,
+      });
+
+      return {
+        content: [
+          {
+            type: "text",
+            text: JSON.stringify(results, null, 2),
+          },
+        ],
+      };
+    } catch (error) {
+      return {
+        content: [
+          {
+            type: "text",
+            text: `Failed to find tools: ${(error as Error).message}`,
           },
         ],
         isError: true,

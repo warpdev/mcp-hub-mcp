@@ -222,6 +222,60 @@ export class McpServerManager {
   }
 
   /**
+   * Find tools matching a pattern across all connected servers.
+   */
+  async findTools(
+    pattern: string,
+    options: {
+      searchIn?: "name" | "description" | "both";
+      caseSensitive?: boolean;
+    } = {}
+  ): Promise<Record<string, any[]>> {
+    const { searchIn = "both", caseSensitive = false } = options;
+    const servers = this.getConnectedServers();
+    
+    if (servers.length === 0) {
+      return {};
+    }
+
+    // Create regex pattern
+    let regex: RegExp;
+    try {
+      regex = new RegExp(pattern, caseSensitive ? "" : "i");
+    } catch (error) {
+      throw new Error(`Invalid regex pattern: ${(error as Error).message}`);
+    }
+
+    const results: Record<string, any[]> = {};
+
+    // Search tools in each server
+    for (const serverName of servers) {
+      try {
+        const toolsResponse = await this.listTools(serverName);
+        
+        if (toolsResponse.tools && Array.isArray(toolsResponse.tools)) {
+          const matchedTools = toolsResponse.tools.filter((tool: any) => {
+            const nameMatch = searchIn !== "description" && tool.name && regex.test(tool.name);
+            const descriptionMatch = searchIn !== "name" && tool.description && regex.test(tool.description);
+            return nameMatch || descriptionMatch;
+          });
+
+          if (matchedTools.length > 0) {
+            results[serverName] = matchedTools;
+          }
+        }
+      } catch (error) {
+        // Include error information in results
+        results[serverName] = [{
+          error: `Failed to search tools: ${(error as Error).message}`
+        }];
+      }
+    }
+
+    return results;
+  }
+
+  /**
    * Disconnect from server.
    */
   async disconnectServer(

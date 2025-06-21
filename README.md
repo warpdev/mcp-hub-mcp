@@ -185,6 +185,71 @@ Calls a tool on a specific server.
 }
 ```
 
+### 3. `find-tools`
+
+Find tools matching a regex pattern across all connected servers (grep-like functionality).
+
+- `pattern`: Regex pattern to search for in tool names and descriptions
+- `searchIn`: Where to search: "name", "description", or "both" (default: "both")
+- `caseSensitive`: Whether the search should be case-sensitive (default: false)
+
+```json
+{
+  "name": "find-tools",
+  "arguments": {
+    "pattern": "file",
+    "searchIn": "both",
+    "caseSensitive": false
+  }
+}
+```
+
+Example patterns:
+- `"file"` - Find all tools containing "file"
+- `"^read"` - Find all tools starting with "read"
+- `"(read|write).*file"` - Find tools for reading or writing files
+- `"config$"` - Find tools ending with "config"
+
+Example output:
+```json
+{
+  "filesystem": [
+    {
+      "name": "readFile",
+      "description": "Read the contents of a file",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Path to the file to read"
+          }
+        },
+        "required": ["path"]
+      }
+    },
+    {
+      "name": "writeFile",
+      "description": "Write content to a file",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Path to the file to write"
+          },
+          "content": {
+            "type": "string",
+            "description": "Content to write to the file"
+          }
+        },
+        "required": ["path", "content"]
+      }
+    }
+  ]
+}
+```
+
 ## Commit Message Convention
 
 This project follows [Conventional Commits](https://www.conventionalcommits.org/) for automatic versioning and CHANGELOG generation.
