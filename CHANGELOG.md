@@ -1,3 +1,11 @@
+# [1.2.0](https://github.com/warpdev/mcp-hub-mcp/compare/v1.1.1...v1.2.0) (2025-06-21)
+
+
+### Features
+
+* add find-tools command for grep-like tool search ([8ffc2e7](https://github.com/warpdev/mcp-hub-mcp/commit/8ffc2e7e0012d8a8df7c0e399341c27ec6771c5b))
+* enhance tool descriptions to promote find-tools usage ([353169d](https://github.com/warpdev/mcp-hub-mcp/commit/353169d92c55a67973d2d0704d3c447d03b4fab2))
+
 ## [1.1.1](https://github.com/warpdev/mcp-hub-mcp/compare/v1.1.0...v1.1.1) (2025-06-02)
 
 
