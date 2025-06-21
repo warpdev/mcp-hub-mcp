@@ -8,9 +8,9 @@ A hub server that connects to and manages other MCP (Model Context Protocol) ser
 
 ## Overview
 
-This project builds an MCP hub server that can connect to other MCP servers, list their tools, and execute them.
-It is especially useful for bypassing Cursor’s 40-tool MCP limit.
-Even outside of Cursor, it helps reduce AI mistakes by hiding infrequently used tools.
+This project builds an MCP hub server that connects to and manages multiple MCP (Model Context Protocol) servers through a single interface.
+It helps prevent excessive context usage and pollution from infrequently used MCPs (e.g., Atlassian MCP, Playwright MCP) by allowing you to connect them only when needed.
+This reduces AI mistakes and improves performance by keeping the active tool set focused and manageable.
 
 ## Key Features
 
@@ -40,13 +40,6 @@ Add this to your `mcp.json`:
 }
 ```
 
-### System Prompt (or Cursor Rules)
-
-```
-Before processing a user's request, you must use the "list_all_tools" command to identify which tools are available.
-```
-
-This ensures that the AI assistant will always check available tools before attempting to use them.
 
 ## Installation and Running
 
@@ -182,6 +175,71 @@ Calls a tool on a specific server.
       "path": "/Users/username/Desktop/example.txt"
     }
   }
+}
+```
+
+### 3. `find-tools`
+
+Find tools matching a regex pattern across all connected servers (grep-like functionality).
+
+- `pattern`: Regex pattern to search for in tool names and descriptions
+- `searchIn`: Where to search: "name", "description", or "both" (default: "both")
+- `caseSensitive`: Whether the search should be case-sensitive (default: false)
+
+```json
+{
+  "name": "find-tools",
+  "arguments": {
+    "pattern": "file",
+    "searchIn": "both",
+    "caseSensitive": false
+  }
+}
+```
+
+Example patterns:
+- `"file"` - Find all tools containing "file"
+- `"^read"` - Find all tools starting with "read"
+- `"(read|write).*file"` - Find tools for reading or writing files
+- `"config$"` - Find tools ending with "config"
+
+Example output:
+```json
+{
+  "filesystem": [
+    {
+      "name": "readFile",
+      "description": "Read the contents of a file",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Path to the file to read"
+          }
+        },
+        "required": ["path"]
+      }
+    },
+    {
+      "name": "writeFile",
+      "description": "Write content to a file",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Path to the file to write"
+          },
+          "content": {
+            "type": "string",
+            "description": "Content to write to the file"
+          }
+        },
+        "required": ["path", "content"]
+      }
+    }
+  ]
 }
 ```
 

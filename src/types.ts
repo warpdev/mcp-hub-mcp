@@ -38,6 +38,26 @@ export type CallToolParams = z.infer<
   typeof CallToolParamsSchema
 >;
 
+export const FindToolsParamsSchema = z.object({
+  pattern: z
+    .string()
+    .describe("Regex pattern to search for in tool names and descriptions"),
+  searchIn: z
+    .enum(["name", "description", "both"])
+    .optional()
+    .default("both")
+    .describe("Where to search: in tool names, descriptions, or both"),
+  caseSensitive: z
+    .boolean()
+    .optional()
+    .default(false)
+    .describe("Whether the search should be case-sensitive"),
+});
+
+export type FindToolsParams = z.infer<
+  typeof FindToolsParamsSchema
+>;
+
 // MCP configuration file interface (claude_desktop_config.json format)
 export interface McpServerConfig {
   command: string;
