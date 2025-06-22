@@ -2,6 +2,10 @@
   <img src="https://imgur.com/DgWxkmv.png" width="200" height="200">
 </p>
 
+[![Install MCP Server](https://cursor.com/deeplink/mcp-install-dark.svg)](https://cursor.com/install-mcp?name=mcp-hub&config=eyJjb21tYW5kIjoibnB4IC15IG1jcC1odWItbWNwIC0tY29uZmlnLXBhdGggfi8uY3Vyc29yL21jcC1odWIuanNvbiJ9)
+
+[![Install in VS Code](https://img.shields.io/badge/VS_Code-Install_Server-0098FF?style=flat-square&logo=visualstudiocode&logoColor=white)](https://insiders.vscode.dev/redirect?url=vscode:mcp/install?%7B%22name%22%3A%22mcp-hub%22%2C%22command%22%3A%22npx%22%2C%22args%22%3A%5B%22-y%22%2C%22mcp-hub-mcp%40latest%22%2C%22--config-path%22%2C%22~%2Fmcp-hub.json%22%5D%7D)
+
 # MCP-Hub-MCP Server
 
 A hub server that connects to and manages other MCP (Model Context Protocol) servers.
@@ -270,12 +274,9 @@ Types:
 Breaking Changes:
 Add `BREAKING CHANGE:` in the commit footer to trigger a MAJOR version bump.
 
-## Tech Stack
+## Other Links
 
-- Node.js
-- TypeScript
-- @modelcontextprotocol/sdk (version: ^1.9.0)
-- zod (version: ^3.22.4)
+- [MCP Reviews](https://mcpreview.com/mcp-servers/warpdev/mcp-hub-mcp)
 
 ## License
 
