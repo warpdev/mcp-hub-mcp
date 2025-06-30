@@ -1,5 +1,6 @@
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js";
+import { StreamableHTTPClientTransport } from "@modelcontextprotocol/sdk/client/streamableHttp.js";
 import {
   ConnectMcpParams,
   McpConfig,
@@ -156,19 +157,52 @@ export class McpServerManager {
       );
     }
 
-    // Set environment variables
-    const env: Record<string, string | undefined> = {
-      ...process.env,
-    };
-    if ("env" in params && params.env) {
-      Object.assign(env, params.env);
-    }
+    // Determine transport type
+    const transportType = params.type || (params.command ? "stdio" : "http");
+    
+    let transport: StdioClientTransport | StreamableHTTPClientTransport;
 
-    const transport = new StdioClientTransport({
-      command: params.command,
-      args: params.args || [],
-      env: env as Record<string, string>,
-    });
+    if (transportType === "http") {
+      // HTTP transport
+      if (!params.url) {
+        throw new Error(
+          `HTTP server '${serverName}' requires a URL.`
+        );
+      }
+      
+      const url = new URL(params.url);
+      
+      // Create transport with headers in requestInit
+      const transportOptions: any = {};
+      if (params.headers) {
+        transportOptions.requestInit = {
+          headers: params.headers
+        };
+      }
+      
+      transport = new StreamableHTTPClientTransport(url, transportOptions);
+    } else {
+      // Stdio transport
+      if (!params.command) {
+        throw new Error(
+          `Stdio server '${serverName}' requires a command.`
+        );
+      }
+
+      // Set environment variables
+      const env: Record<string, string | undefined> = {
+        ...process.env,
+      };
+      if ("env" in params && params.env) {
+        Object.assign(env, params.env);
+      }
+
+      transport = new StdioClientTransport({
+        command: params.command,
+        args: params.args || [],
+        env: env as Record<string, string>,
+      });
+    }
 
     const client = new Client({
       name: `mcp-client-${serverName}`,
@@ -197,6 +231,85 @@ export class McpServerManager {
   async listTools(serverName: string): Promise<any> {
     const client = this.getClient(serverName);
     return await client.listTools();
+  }
+
+  /**
+   * Get a specific tool with complete schema from a connected server.
+   */
+  async getTool(serverName: string, toolName: string): Promise<any> {
+    const client = this.getClient(serverName);
+    const toolsResponse = await client.listTools();
+    
+    if (!toolsResponse.tools || !Array.isArray(toolsResponse.tools)) {
+      throw new Error(`No tools found on server '${serverName}'`);
+    }
+
+    const tool = toolsResponse.tools.find((t: any) => t.name === toolName);
+    
+    if (!tool) {
+      throw new Error(`Tool '${toolName}' not found on server '${serverName}'`);
+    }
+
+    return tool;
+  }
+
+  /**
+   * List tools from a specific server (name and description only).
+   */
+  async listToolsInServer(serverName: string): Promise<any> {
+    const client = this.getClient(serverName);
+    const toolsResponse = await client.listTools();
+    
+    if (!toolsResponse.tools || !Array.isArray(toolsResponse.tools)) {
+      return { tools: [] };
+    }
+
+    // Filter to only include name and description
+    return {
+      tools: toolsResponse.tools.map((tool: any) => ({
+        name: tool.name,
+        description: tool.description,
+      }))
+    };
+  }
+
+  /**
+   * Find tools matching a pattern in a specific server (name and description only).
+   */
+  async findToolsInServer(
+    serverName: string,
+    pattern: string,
+    searchIn: "name" | "description" | "both" = "both",
+    caseSensitive: boolean = false
+  ): Promise<any[]> {
+    const client = this.getClient(serverName);
+    const toolsResponse = await client.listTools();
+
+    if (!toolsResponse.tools || !Array.isArray(toolsResponse.tools)) {
+      return [];
+    }
+
+    const flags = caseSensitive ? "g" : "gi";
+    const regex = new RegExp(pattern, flags);
+
+    const matchedTools = toolsResponse.tools.filter((tool: any) => {
+      const nameMatch = searchIn !== "description" && tool.name && regex.test(tool.name);
+      const descriptionMatch = searchIn !== "name" && tool.description && regex.test(tool.description);
+      return nameMatch || descriptionMatch;
+    });
+
+    // Filter to only include name and description
+    return matchedTools.map((tool: any) => ({
+      name: tool.name,
+      description: tool.description,
+    }));
+  }
+
+  /**
+   * List all connected server names.
+   */
+  listServers(): string[] {
+    return this.getConnectedServers();
   }
 
   /**
@@ -258,7 +371,10 @@ export class McpServerManager {
             const nameMatch = searchIn !== "description" && tool.name && regex.test(tool.name);
             const descriptionMatch = searchIn !== "name" && tool.description && regex.test(tool.description);
             return nameMatch || descriptionMatch;
-          });
+          }).map((tool: any) => ({
+            name: tool.name,
+            description: tool.description,
+          }));
 
           if (matchedTools.length > 0) {
             results[serverName] = matchedTools;

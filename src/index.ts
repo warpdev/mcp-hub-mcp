@@ -3,7 +3,13 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { McpServerManager } from "./server-manager.js";
-import { CallToolParamsSchema, FindToolsParamsSchema } from "./types.js";
+import { 
+  CallToolParamsSchema, 
+  FindToolsParamsSchema, 
+  GetToolParamsSchema,
+  ListToolsInServerParamsSchema,
+  FindToolsInServerParamsSchema
+} from "./types.js";
 
 // Create MCP server manager instance (auto load enabled)
 const serverManager = new McpServerManager({
@@ -21,7 +27,7 @@ const server = new McpServer({
 // Tool to return tools list from all servers
 server.tool(
   "list-all-tools",
-  "List ALL available tools from all connected servers (returns complete inventory). NOTE: For better performance, use find-tools with keywords first. Only use this when you need to see everything or if find-tools didn't find what you need",
+  "List ALL available tools from all connected servers. NOTE: For better performance, use find-tools with keywords first. Only use this when you need to see everything or if find-tools didn't find what you need",
   {}, // Use empty object when there are no parameters
   async (args, extra) => {
     try {
@@ -44,7 +50,18 @@ server.tool(
       for (const serverName of servers) {
         try {
           const toolsResponse = await serverManager.listTools(serverName);
-          allTools[serverName] = toolsResponse;
+          
+          // Filter to only include name and description
+          if (toolsResponse.tools && Array.isArray(toolsResponse.tools)) {
+            allTools[serverName] = {
+              tools: toolsResponse.tools.map((tool: any) => ({
+                name: tool.name,
+                description: tool.description,
+              }))
+            };
+          } else {
+            allTools[serverName] = toolsResponse;
+          }
         } catch (error) {
           allTools[serverName] = {
             error: `Failed to get tools list: ${(error as Error).message}`,
@@ -155,6 +172,144 @@ server.tool(
       };
     }
   },
+);
+
+// Tool to get detailed information about a specific tool
+server.tool(
+  "get-tool",
+  "Get complete schema for a specific tool from a specific server, including inputSchema. TIP: Use find-tools first to discover the tool and get the correct serverName and toolName",
+  {
+    serverName: GetToolParamsSchema.shape.serverName,
+    toolName: GetToolParamsSchema.shape.toolName,
+  },
+  async (args, extra) => {
+    try {
+      const { serverName, toolName } = args;
+      const tool = await serverManager.getTool(serverName, toolName);
+
+      return {
+        content: [
+          {
+            type: "text",
+            text: JSON.stringify(tool, null, 2),
+          },
+        ],
+      };
+    } catch (error) {
+      return {
+        content: [
+          {
+            type: "text",
+            text: `Error getting tool: ${(error as Error).message}`,
+          },
+        ],
+      };
+    }
+  }
+);
+
+// Tool to list all tools from a specific server
+server.tool(
+  "list-all-tools-in-server", 
+  "List ALL tools from a specific MCP server (returns name and description only)",
+  {
+    serverName: ListToolsInServerParamsSchema.shape.serverName,
+  },
+  async (args, extra) => {
+    try {
+      const { serverName } = args;
+      const result = await serverManager.listToolsInServer(serverName);
+
+      return {
+        content: [
+          {
+            type: "text", 
+            text: JSON.stringify(result, null, 2),
+          },
+        ],
+      };
+    } catch (error) {
+      return {
+        content: [
+          {
+            type: "text",
+            text: `Error listing tools from server '${args.serverName}': ${(error as Error).message}`,
+          },
+        ],
+      };
+    }
+  }
+);
+
+// Tool to find tools in a specific server
+server.tool(
+  "find-tools-in-server",
+  "Find tools matching a pattern in a specific MCP server (returns name and description only)",
+  {
+    serverName: FindToolsInServerParamsSchema.shape.serverName,
+    pattern: FindToolsInServerParamsSchema.shape.pattern,
+    searchIn: FindToolsInServerParamsSchema.shape.searchIn,
+    caseSensitive: FindToolsInServerParamsSchema.shape.caseSensitive,
+  },
+  async (args, extra) => {
+    try {
+      const { serverName, pattern, searchIn, caseSensitive } = args;
+      const results = await serverManager.findToolsInServer(
+        serverName,
+        pattern,
+        searchIn,
+        caseSensitive
+      );
+
+      return {
+        content: [
+          {
+            type: "text",
+            text: JSON.stringify({ tools: results }, null, 2),
+          },
+        ],
+      };
+    } catch (error) {
+      return {
+        content: [
+          {
+            type: "text",
+            text: `Error finding tools in server '${args.serverName}': ${(error as Error).message}`,
+          },
+        ],
+      };
+    }
+  }
+);
+
+// Tool to list all connected servers
+server.tool(
+  "list-servers",
+  "List all connected MCP servers",
+  {}, // No parameters needed
+  async (args, extra) => {
+    try {
+      const servers = serverManager.listServers();
+
+      return {
+        content: [
+          {
+            type: "text",
+            text: JSON.stringify({ servers }, null, 2),
+          },
+        ],
+      };
+    } catch (error) {
+      return {
+        content: [
+          {
+            type: "text",
+            text: `Error listing servers: ${(error as Error).message}`,
+          },
+        ],
+      };
+    }
+  }
 );
 
 // Start server
