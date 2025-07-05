@@ -1,3 +1,10 @@
+# [1.3.0](https://github.com/warpdev/mcp-hub-mcp/compare/v1.2.0...v1.3.0) (2025-07-05)
+
+
+### Features
+
+* enhance MCP server functionality with new tools and transport options ([ae319dd](https://github.com/warpdev/mcp-hub-mcp/commit/ae319dd22311f3d2d6beaf07f53b7d5621bd7543))
+
 # [1.2.0](https://github.com/warpdev/mcp-hub-mcp/compare/v1.1.1...v1.2.0) (2025-06-21)
 
 
