@@ -10,6 +10,10 @@
 
 A hub server that connects to and manages other MCP (Model Context Protocol) servers.
 
+<a href="https://glama.ai/mcp/servers/@warpdev/mcp-hub-mcp">
+  <img width="380" height="200" src="https://glama.ai/mcp/servers/@warpdev/mcp-hub-mcp/badge" alt="Hub Server MCP server" />
+</a>
+
 ## Overview
 
 This project builds an MCP hub server that connects to and manages multiple MCP (Model Context Protocol) servers through a single interface.
