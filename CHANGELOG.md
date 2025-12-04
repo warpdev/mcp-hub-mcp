@@ -1,3 +1,10 @@
+## [1.3.1](https://github.com/warpdev/mcp-hub-mcp/compare/v1.3.0...v1.3.1) (2025-12-04)
+
+
+### Bug Fixes
+
+* **deps:** upgrade @modelcontextprotocol/sdk to 1.24.2 ([aba52b1](https://github.com/warpdev/mcp-hub-mcp/commit/aba52b1b38a49ea98a2af2f262dfe9913d488eb7))
+
 # [1.3.0](https://github.com/warpdev/mcp-hub-mcp/compare/v1.2.0...v1.3.0) (2025-07-05)
 
 
