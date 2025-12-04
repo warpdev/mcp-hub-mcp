@@ -2,14 +2,8 @@
 
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+import { z } from "zod";
 import { McpServerManager } from "./server-manager.js";
-import { 
-  CallToolParamsSchema, 
-  FindToolsParamsSchema, 
-  GetToolParamsSchema,
-  ListToolsInServerParamsSchema,
-  FindToolsInServerParamsSchema
-} from "./types.js";
 
 // Create MCP server manager instance (auto load enabled)
 const serverManager = new McpServerManager({
@@ -20,16 +14,18 @@ const serverManager = new McpServerManager({
 const server = new McpServer({
   name: "MCP-Hub-Server",
   version: "1.0.0",
-  description:
-    "Your central hub for ALL available tools. Use this server to discover and execute any tool you need. All system tools are accessible through here - search, find, and call them via this server.",
+  title: "MCP Hub",
 });
 
 // Tool to return tools list from all servers
-server.tool(
+server.registerTool(
   "list-all-tools",
-  "List ALL available tools from all connected servers. NOTE: For better performance, use find-tools with keywords first. Only use this when you need to see everything or if find-tools didn't find what you need",
-  {}, // Use empty object when there are no parameters
-  async (args, extra) => {
+  {
+    title: "List All Tools",
+    description: "List ALL available tools from all connected servers. NOTE: For better performance, use find-tools with keywords first. Only use this when you need to see everything or if find-tools didn't find what you need",
+    inputSchema: {},
+  },
+  async () => {
     try {
       const servers = serverManager.getConnectedServers();
 
@@ -94,17 +90,19 @@ server.tool(
 );
 
 // Tool to call a specific tool from a specific server
-server.tool(
+server.registerTool(
   "call-tool",
-  "Call a specific tool from a specific server. TIP: Use find-tools first to discover the tool and get the correct serverName and toolName",
   {
-    serverName: CallToolParamsSchema.shape.serverName,
-    toolName: CallToolParamsSchema.shape.toolName,
-    toolArgs: CallToolParamsSchema.shape.toolArgs,
+    title: "Call Tool",
+    description: "Call a specific tool from a specific server. TIP: Use find-tools first to discover the tool and get the correct serverName and toolName",
+    inputSchema: {
+      serverName: z.string().describe("Name of the MCP server to call tool from"),
+      toolName: z.string().describe("Name of the tool to call"),
+      toolArgs: z.record(z.unknown()).describe("Arguments to pass to the tool"),
+    },
   },
-  async (args, extra) => {
+  async ({ serverName, toolName, toolArgs }) => {
     try {
-      const { serverName, toolName, toolArgs } = args;
       const result = await serverManager.callTool(
         serverName,
         toolName,
@@ -134,19 +132,19 @@ server.tool(
 );
 
 // Tool to find tools matching a pattern across all servers
-server.tool(
+server.registerTool(
   "find-tools",
-  `Use this tool to find best tools by searching with keywords or regex patterns.
-  If you don't have a specific tool for a task, this is the best way to discover what tools are available.
-  `,
   {
-    pattern: FindToolsParamsSchema.shape.pattern,
-    searchIn: FindToolsParamsSchema.shape.searchIn,
-    caseSensitive: FindToolsParamsSchema.shape.caseSensitive,
+    title: "Find Tools",
+    description: "Use this tool to find best tools by searching with keywords or regex patterns. If you don't have a specific tool for a task, this is the best way to discover what tools are available.",
+    inputSchema: {
+      pattern: z.string().describe("Regex pattern to search for in tool names and descriptions"),
+      searchIn: z.enum(["name", "description", "both"]).optional().default("both").describe("Where to search: in tool names, descriptions, or both"),
+      caseSensitive: z.boolean().optional().default(false).describe("Whether the search should be case-sensitive"),
+    },
   },
-  async (args, extra) => {
+  async ({ pattern, searchIn, caseSensitive }) => {
     try {
-      const { pattern, searchIn, caseSensitive } = args;
       const results = await serverManager.findTools(pattern, {
         searchIn,
         caseSensitive,
@@ -175,16 +173,18 @@ server.tool(
 );
 
 // Tool to get detailed information about a specific tool
-server.tool(
+server.registerTool(
   "get-tool",
-  "Get complete schema for a specific tool from a specific server, including inputSchema. TIP: Use find-tools first to discover the tool and get the correct serverName and toolName",
   {
-    serverName: GetToolParamsSchema.shape.serverName,
-    toolName: GetToolParamsSchema.shape.toolName,
+    title: "Get Tool Schema",
+    description: "Get complete schema for a specific tool from a specific server, including inputSchema. TIP: Use find-tools first to discover the tool and get the correct serverName and toolName",
+    inputSchema: {
+      serverName: z.string().describe("Name of the MCP server containing the tool"),
+      toolName: z.string().describe("Exact name of the tool to retrieve"),
+    },
   },
-  async (args, extra) => {
+  async ({ serverName, toolName }) => {
     try {
-      const { serverName, toolName } = args;
       const tool = await serverManager.getTool(serverName, toolName);
 
       return {
@@ -209,15 +209,17 @@ server.tool(
 );
 
 // Tool to list all tools from a specific server
-server.tool(
-  "list-all-tools-in-server", 
-  "List ALL tools from a specific MCP server (returns name and description only)",
+server.registerTool(
+  "list-all-tools-in-server",
   {
-    serverName: ListToolsInServerParamsSchema.shape.serverName,
+    title: "List Tools in Server",
+    description: "List ALL tools from a specific MCP server (returns name and description only)",
+    inputSchema: {
+      serverName: z.string().describe("Name of the MCP server to list tools from"),
+    },
   },
-  async (args, extra) => {
+  async ({ serverName }) => {
     try {
-      const { serverName } = args;
       const result = await serverManager.listToolsInServer(serverName);
 
       return {
@@ -233,7 +235,7 @@ server.tool(
         content: [
           {
             type: "text",
-            text: `Error listing tools from server '${args.serverName}': ${(error as Error).message}`,
+            text: `Error listing tools from server '${serverName}': ${(error as Error).message}`,
           },
         ],
       };
@@ -242,18 +244,20 @@ server.tool(
 );
 
 // Tool to find tools in a specific server
-server.tool(
+server.registerTool(
   "find-tools-in-server",
-  "Find tools matching a pattern in a specific MCP server (returns name and description only)",
   {
-    serverName: FindToolsInServerParamsSchema.shape.serverName,
-    pattern: FindToolsInServerParamsSchema.shape.pattern,
-    searchIn: FindToolsInServerParamsSchema.shape.searchIn,
-    caseSensitive: FindToolsInServerParamsSchema.shape.caseSensitive,
+    title: "Find Tools in Server",
+    description: "Find tools matching a pattern in a specific MCP server (returns name and description only)",
+    inputSchema: {
+      serverName: z.string().describe("Name of the MCP server to search tools in"),
+      pattern: z.string().describe("Regex pattern to search for in tool names and descriptions"),
+      searchIn: z.enum(["name", "description", "both"]).default("both").describe("Where to search: in tool names, descriptions, or both"),
+      caseSensitive: z.boolean().default(false).describe("Whether the search should be case-sensitive"),
+    },
   },
-  async (args, extra) => {
+  async ({ serverName, pattern, searchIn, caseSensitive }) => {
     try {
-      const { serverName, pattern, searchIn, caseSensitive } = args;
       const results = await serverManager.findToolsInServer(
         serverName,
         pattern,
@@ -274,7 +278,7 @@ server.tool(
         content: [
           {
             type: "text",
-            text: `Error finding tools in server '${args.serverName}': ${(error as Error).message}`,
+            text: `Error finding tools in server '${serverName}': ${(error as Error).message}`,
           },
         ],
       };
@@ -283,11 +287,14 @@ server.tool(
 );
 
 // Tool to list all connected servers
-server.tool(
+server.registerTool(
   "list-servers",
-  "List all connected MCP servers",
-  {}, // No parameters needed
-  async (args, extra) => {
+  {
+    title: "List Servers",
+    description: "List all connected MCP servers",
+    inputSchema: {},
+  },
+  async () => {
     try {
       const servers = serverManager.listServers();
 

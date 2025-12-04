@@ -25,7 +25,7 @@
 	"author": "",
 	"license": "MIT",
 	"dependencies": {
-		"@modelcontextprotocol/sdk": "^1.13.0",
+		"@modelcontextprotocol/sdk": "^1.24.2",
 		"zod": "^3.25.67"
 	},
 	"devDependencies": {
@@ -34,5 +34,11 @@
 		"@types/node": "^22.15.32",
 		"semantic-release": "^24.2.5",
 		"typescript": "^5.8.3"
+	},
+	"pnpm": {
+		"overrides": {
+			"body-parser": ">=2.2.1",
+			"js-yaml": ">=4.1.1"
+		}
 	}
 }
